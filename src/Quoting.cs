@@ -39,8 +39,15 @@ public class Quoting
                 }
                 i++;
             }
-            // Handle backslash escapes
+            // Handle backslash escapes outside quotes
             else if (ch == '\\' && i + 1 < input.Length && !inQuotes)
+            {
+                i++;
+                currentArg.Append(input[i]);
+                i++;
+            }
+            // Handle backslash escapes inside double quotes (but not single quotes)
+            else if (ch == '\\' && i + 1 < input.Length && inQuotes && quoteChar == '\"')
             {
                 i++;
                 currentArg.Append(input[i]);
