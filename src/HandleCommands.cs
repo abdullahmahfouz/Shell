@@ -9,7 +9,7 @@ using System.Threading.Tasks.Dataflow;
 public class HandleCommands
 {
     // Define the set of built-in shell commands
-    private static HashSet<string> builtinCommands = new HashSet<string> { "exit", "echo", "type", "pwd", "cd", "cat"};
+    private static HashSet<string> builtinCommands = new HashSet<string> { "exit", "echo", "type", "pwd", "cd"};
     
     // Handle the type command - identifies whether a command is builtin or external
     public static void HandleType(string input)

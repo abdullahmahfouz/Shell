@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class ProcessCommands
 {
     // Define the set of built-in shell commands that don't need to be searched in PATH
-    private static HashSet<string> builtinCommands = new HashSet<string> { "exit", "echo", "type", "pwd", "cd", "cat"};
+    private static HashSet<string> builtinCommands = new HashSet<string> { "exit", "echo", "type", "pwd", "cd"};
     
     // Parse and execute the input command
     public static void ProcessCommand(string input)
