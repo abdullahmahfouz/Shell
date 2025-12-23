@@ -47,11 +47,29 @@ public class Quoting
                 i++;
             }
             // Handle backslash escapes inside double quotes (but not single quotes)
+            // Only escape specific characters: ", \, $, `, and newline
             else if (ch == '\\' && i + 1 < input.Length && inQuotes && quoteChar == '\"')
             {
-                i++;
-                currentArg.Append(input[i]);
-                i++;
+                char nextChar = input[i + 1];
+                if (nextChar == '\"' || nextChar == '\\' || nextChar == '$' || nextChar == '`' || nextChar == 'n')
+                {
+                    i++; // Skip backslash
+                    if (nextChar == 'n')
+                    {
+                        currentArg.Append('\n'); // Convert \n to newline
+                    }
+                    else
+                    {
+                        currentArg.Append(nextChar);
+                    }
+                    i++;
+                }
+                else
+                {
+                    // For other characters, preserve the backslash
+                    currentArg.Append(ch);
+                    i++;
+                }
             }
             // Regular character
             else
