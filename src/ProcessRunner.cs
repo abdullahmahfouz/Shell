@@ -65,8 +65,11 @@ public class ProcessRunner
         
         // Build the command: exec -a <commandName> <fullPath> <args...>
         // exec -a allows us to set argv[0] explicitly
+        // Escape single quotes in commandName and path
+        var escapedCommandName = commandName.Replace("'", "'\\''");
+        var escapedPath = path.Replace("'", "'\\''");
         var escapedArgs = args.Select(a => $"'{a.Replace("'", "'\\''")}'");
-        var commandLine = $"exec -a '{commandName}' '{path}' {string.Join(" ", escapedArgs)}";
+        var commandLine = $"exec -a '{escapedCommandName}' '{escapedPath}' {string.Join(" ", escapedArgs)}";
         
         startInfo.ArgumentList.Add("-c");
         startInfo.ArgumentList.Add(commandLine);
