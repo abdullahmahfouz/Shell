@@ -17,7 +17,7 @@ public class Quoting
             var ch = input[i];
 
             // Handle quote characters
-            if ((ch == '\'' || ch == '\"') && !inQuotes)
+            if ((ch == '\'' || ch == '"') && !inQuotes)
             {
                 inQuotes = true;
                 quoteChar = ch;
@@ -47,11 +47,11 @@ public class Quoting
                 i++;
             }
             // Handle backslash escapes inside double quotes (but not single quotes)
-            // Only escape specific characters: ", \, $, `
-            else if (ch == '\\' && i + 1 < input.Length && inQuotes && quoteChar == '\"')
+            // Only escape specific characters: ", \\, $, `
+            else if (ch == '\\' && i + 1 < input.Length && inQuotes && quoteChar == '"')
             {
                 char nextChar = input[i + 1];
-                if (nextChar == '\"' || nextChar == '\\' || nextChar == '$' || nextChar == '`')
+                if (nextChar == '"' || nextChar == '\\' || nextChar == '$' || nextChar == '`')
                 {
                     i++; // Skip backslash
                     currentArg.Append(nextChar);
@@ -103,11 +103,11 @@ public class Quoting
                 i++; // Skip closing quote
             }
             // Handle double quotes - preserve spaces, allow backslash escapes
-            else if (input[i] == '\"')
+            else if (input[i] == '"')
             {
                 i++; // Skip opening quote
                 // Find closing quote, handle backslash escapes
-                while (i < input.Length && input[i] != '\"')
+                while (i < input.Length && input[i] != '"')
                 {
                     if (input[i] == '\\' && i + 1 < input.Length)
                     {
