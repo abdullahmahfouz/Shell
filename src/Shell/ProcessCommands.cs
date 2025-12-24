@@ -1,15 +1,12 @@
 using System;
-using System.Collections.Generic;
+using System.IO;
 
 public class ProcessCommands
 {
     public static void ProcessCommand(string input)
     {
         var command = CommandLineParser.Parse(input);
-        if (command == null)
-        {
-            return;
-        }
+        if (command == null) return;
 
         switch (command.Name)
         {
@@ -20,57 +17,81 @@ public class ProcessCommands
             case "echo":
             {
                 var echoContent = string.Join(" ", command.Args);
-                RunWithOptionalRedirection(command.OutputFile, () => Builtins.HandleEcho(echoContent));
+                // Builtin echo supports optional stdout/stderr redirection
+                RunWithRedirections(command, () => Builtins.HandleEcho(echoContent));
                 break;
             }
 
             case "type":
             {
                 var typeInput = command.Args.Length > 0 ? $"type {string.Join(" ", command.Args)}" : "type";
-                RunWithOptionalRedirection(command.OutputFile, () => Builtins.HandleType(typeInput));
+                // Builtin type prints info about builtins or PATH lookups
+                RunWithRedirections(command, () => Builtins.HandleType(typeInput));
                 break;
             }
 
             case "pwd":
-                Builtins.HandlePwd(command.OutputFile);
+                // Builtin pwd prints current directory (optionally redirected)
+                RunWithRedirections(command, () => Builtins.HandlePwd(command.OutputFile));
                 break;
 
             case "cd":
+                // cd affects current process; no redirection support needed
                 Navigation.ChangeDir(command.Args);
                 break;
 
             case "cat":
-                RunWithOptionalRedirection(command.OutputFile, () => Builtins.HandleCat(command.Args));
+                // cat reads files/stdin; allow redirection for stdout/stderr
+                RunWithRedirections(command, () => Builtins.HandleCat(command.Args));
                 break;
 
             default:
-                RunExternal(command);
+            {
+                var programPath = ProcessRunner.FindInPath(command.Name);
+                if (programPath != null)
+                {
+                    // External: run via PATH resolution with optional redirection
+                    ProcessRunner.RunExternal(programPath, command.Args, command.OutputFile, command.ErrorFile);
+                }
+                else
+                {
+                    Console.WriteLine($"{command.Name}: command not found");
+                }
                 break;
+            }
         }
     }
 
-    private static void RunWithOptionalRedirection(string? outputFile, Action action)
+    private static void RunWithRedirections(Command command, Action action)
     {
-        if (outputFile != null)
+        var originalOut = Console.Out;
+        var originalErr = Console.Error;
+        StreamWriter? outWriter = null;
+        StreamWriter? errWriter = null;
+
+        try
         {
-            OutputRedirection.RunWithOutputRedirection(outputFile, action);
-        }
-        else
-        {
+            if (command.OutputFile != null)
+            {
+                outWriter = new StreamWriter(command.OutputFile) { AutoFlush = true };
+                Console.SetOut(outWriter);
+            }
+
+            if (command.ErrorFile != null)
+            {
+                errWriter = new StreamWriter(command.ErrorFile) { AutoFlush = true };
+                Console.SetError(errWriter);
+            }
+
             action();
         }
-    }
-
-    private static void RunExternal(Command command)
-    {
-        var programPath = ProcessRunner.FindInPath(command.Name);
-        if (programPath != null)
+        finally
         {
-            ProcessRunner.RunExternalProgram(programPath, command.Name, command.Args, command.OutputFile);
-        }
-        else
-        {
-            Console.WriteLine($"{command.Name}: command not found");
+            // Flush/close redirected streams then restore console streams
+            errWriter?.Dispose();
+            outWriter?.Dispose();
+            Console.SetOut(originalOut);
+            Console.SetError(originalErr);
         }
     }
 }

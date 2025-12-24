@@ -70,4 +70,41 @@ public class ProcessRunner
             Console.WriteLine($"Error running external program: {ex.Message}");
         }
     }
+
+    public static int RunExternal(string fileName, string[] args, string? outputFile, string? errorFile)
+    {
+        var psi = new ProcessStartInfo
+        {
+            FileName = fileName,
+            RedirectStandardOutput = outputFile != null,
+            RedirectStandardError = errorFile != null,
+            RedirectStandardInput = false,
+            UseShellExecute = false
+        };
+        foreach (var a in args) psi.ArgumentList.Add(a);
+
+        using var proc = Process.Start(psi);
+        if (proc == null) return 1;
+
+        if (outputFile != null)
+        {
+            var stdout = proc.StandardOutput.ReadToEndAsync();
+            File.WriteAllText(outputFile, stdout.Result);
+        }
+
+        if (errorFile != null)
+        {
+            var stderr = proc.StandardError.ReadToEndAsync();
+            File.WriteAllText(errorFile, stderr.Result);
+        }
+        else
+        {
+            // still forward stderr to console if we redirected stdout only
+            var stderr = proc.StandardError.ReadToEndAsync();
+            Console.Error.Write(stderr.Result);
+        }
+
+        proc.WaitForExit();
+        return proc.ExitCode;
+    }
 }

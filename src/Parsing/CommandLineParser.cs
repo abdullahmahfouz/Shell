@@ -16,6 +16,7 @@ public static class CommandLineParser
         var args = parts.Skip(1).ToArray();
 
         string? outputFile = null;
+        string? errorFile = null;
         var finalArgs = new List<string>();
 
         for (var i = 0; i < args.Length; i++)
@@ -43,9 +44,21 @@ public static class CommandLineParser
                 }
             }
 
+            // stderr redirection: "2>", "2>/file"
+            if (arg == "2>")
+            {
+                if (i + 1 < args.Length) { errorFile = args[i + 1]; i++; }
+                continue;
+            }
+            if (arg.StartsWith("2>"))
+            {
+                var trimmed = arg.Substring(2);
+                if (!string.IsNullOrEmpty(trimmed)) { errorFile = trimmed; continue; }
+            }
+
             finalArgs.Add(arg);
         }
 
-        return new Command(command, finalArgs.ToArray(), outputFile, input);
+        return new Command(command, finalArgs.ToArray(), outputFile, errorFile, input);
     }
 }
