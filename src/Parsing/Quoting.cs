@@ -111,7 +111,16 @@ public class Quoting
                 {
                     if (input[i] == '\\' && i + 1 < input.Length)
                     {
-                        i++; // Skip backslash and take next character
+                        var next = input[i + 1];
+                        // In double quotes, only escape " \ $ `
+                        if (next == '"' || next == '\\' || next == '$' || next == '`')
+                        {
+                            i++; // Skip backslash
+                            result.Append(input[i]);
+                            i++;
+                            continue;
+                        }
+                        // Otherwise, keep the backslash
                     }
                     result.Append(input[i]);
                     i++;
