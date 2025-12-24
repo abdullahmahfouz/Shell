@@ -5,6 +5,8 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
+using System.ComponentModel;
+using System.Net.Http.Headers;
 
 public class HandleCommands
 {
@@ -44,6 +46,8 @@ public class HandleCommands
     public static void HandleEcho(string content)
     {
         // Parse and process quotes in the content
+       
+        
         var output = Quoting.ParseQuotedString(content);
         Console.WriteLine(output);
     }
@@ -85,4 +89,56 @@ public class HandleCommands
             }
         }
     }
+
+    public static void HandlePwd(string? outputFile)
+    {
+        var currentDir = Navigation.GetCurrentDirectory();
+        if (outputFile == null)
+        {
+            // Print to console if no output file specified
+            Console.WriteLine(currentDir);
+        }
+        else
+        {
+            try
+            {
+                // Write the current directory to the specified output file
+                File.WriteAllText(outputFile, currentDir + Environment.NewLine);
+            }
+            catch (Exception ex)
+            {
+                // Handle errors during file writing
+                Console.WriteLine($"pwd: {outputFile}: {ex.Message}");
+            }
+        }
+    }
+
+    private static void RunWithOutputRedirection(string content, string outputFile, Action action)
+    {
+        var originalOut = Console.Out;
+        try
+        {
+            if(outputFile != null)
+            {
+                var fs = File.Create(outputFile);
+                var sw = new StreamWriter(fs) { AutoFlush = true };
+                Console.SetOut(sw);
+            }
+            action();
+        }
+        catch (Exception ex)
+        {
+            Console.SetOut(originalOut);
+            Console.WriteLine($"Error during output redirection: {ex.Message}");
+        }
+        finally
+        {
+            if(outputFile != null)
+            {
+                Console.Out.Close();
+                Console.SetOut(originalOut);
+            }
+        }
+    }
+    
 }

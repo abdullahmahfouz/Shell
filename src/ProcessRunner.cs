@@ -56,7 +56,7 @@ public class ProcessRunner
     }
     
     // Run an external program with specified arguments
-    public static void RunExternalProgram(string path, string commandName, string[] args)
+    public static void RunExternalProgram(string path, string commandName, string[] args, string? outputFile = null)
     {
         // To properly set argv[0] to just the command name (not full path),
         // we need to use exec -a through a shell
@@ -70,6 +70,11 @@ public class ProcessRunner
         var escapedPath = path.Replace("'", "'\\''");
         var escapedArgs = args.Select(a => $"'{a.Replace("'", "'\\''")}'");
         var commandLine = $"exec -a '{escapedCommandName}' '{escapedPath}' {string.Join(" ", escapedArgs)}";
+
+        if(outputFile != null)
+        {
+            commandLine += $" > '{outputFile}'";
+        }
         
         startInfo.ArgumentList.Add("-c");
         startInfo.ArgumentList.Add(commandLine);

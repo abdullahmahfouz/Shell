@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 
 public class ProcessCommands
 {
@@ -18,6 +19,26 @@ public class ProcessCommands
 
         var command = parts[0]; // First element is the command
         var args = parts.Skip(1).ToArray(); // Get everything after the command as arguments
+
+        string? outputFile = null;
+        var  finalargs = new List<string>();
+
+        for(int i =0; i < args.Length; i++)
+        {
+            if (args[i] == ">")
+            {
+                if (i + 1 < args.Length)
+                {
+                    outputFile = args[i + 1];
+                    i++; // Skip the filename in the next iteration
+                }
+            }
+            else
+            {
+                finalargs.Add(args[i]);
+            }
+        }
+        args = finalargs.ToArray();
 
         // Handle exit command - terminates the shell
         if (command == "exit")
@@ -39,7 +60,7 @@ public class ProcessCommands
         }
         else if (command == "pwd"){
             // Print the current working directory
-            Console.WriteLine(Navigation.GetCurrentDirectory());
+            HandleCommands.HandlePwd(outputFile);
         }
         // Handle cd command - changes the current working directory
         else if (command == "cd")
