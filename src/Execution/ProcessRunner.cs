@@ -97,12 +97,6 @@ public class ProcessRunner
             var stderr = proc.StandardError.ReadToEndAsync();
             File.WriteAllText(errorFile, stderr.Result);
         }
-        else
-        {
-            // still forward stderr to console if we redirected stdout only
-            var stderr = proc.StandardError.ReadToEndAsync();
-            Console.Error.Write(stderr.Result);
-        }
 
         proc.WaitForExit();
         return proc.ExitCode;
