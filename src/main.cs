@@ -17,7 +17,7 @@ class Program
             Console.Write("$ ");
             // Read user input
             var input = Console.ReadLine();
-            
+
             // Process the command if input is not null
             if (input != null)
             {

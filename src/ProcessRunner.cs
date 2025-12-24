@@ -12,26 +12,26 @@ public class ProcessRunner
     {
         // Get the PATH environment variable
         var pathEnv = Environment.GetEnvironmentVariable("PATH");
-        
+
         // Return null if PATH is not set
         if (pathEnv == null) return null;
-        
+
         // Split PATH into individual directories
         var directories = pathEnv.Split(Path.PathSeparator);
-        
+
         // Search each directory for the command
         foreach (var dir in directories)
         {
             // Construct the full path to the potential executable
             var fullPath = Path.Combine(dir, command);
-            
+
             // Check if file exists and is executable
             if (File.Exists(fullPath) && IsExecutable(fullPath))
             {
                 return fullPath;
             }
         }
-        
+
         // Command not found in any PATH directory
         return null;
     }
@@ -54,7 +54,7 @@ public class ProcessRunner
             return false;
         }
     }
-    
+
     // Run an external program with specified arguments
     public static void RunExternalProgram(string path, string commandName, string[] args, string? outputFile = null)
     {
@@ -62,7 +62,7 @@ public class ProcessRunner
         // we need to use exec -a through a shell
         ProcessStartInfo startInfo = new ProcessStartInfo();
         startInfo.FileName = "/bin/sh";
-        
+
         // Build the command: exec -a <commandName> <fullPath> <args...>
         // exec -a allows us to set argv[0] explicitly
         // Escape single quotes in commandName and path
@@ -71,16 +71,17 @@ public class ProcessRunner
         var escapedArgs = args.Select(a => $"'{a.Replace("'", "'\\''")}'");
         var commandLine = $"exec -a '{escapedCommandName}' '{escapedPath}' {string.Join(" ", escapedArgs)}";
 
-        if(outputFile != null)
+        if (outputFile != null)
         {
             commandLine += $" > '{outputFile}'";
         }
-        
+
         startInfo.ArgumentList.Add("-c");
         startInfo.ArgumentList.Add(commandLine);
         startInfo.UseShellExecute = false;
 
-        try{
+        try
+        {
             // Start the process and wait for it to complete
             using (Process? process = Process.Start(startInfo))
             {

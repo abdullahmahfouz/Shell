@@ -11,15 +11,15 @@ using System.Net.Http.Headers;
 public class HandleCommands
 {
     // Define the set of built-in shell commands
-    private static HashSet<string> builtinCommands = new HashSet<string> { "exit", "echo", "type", "pwd", "cd"};
-    
+    private static HashSet<string> builtinCommands = new HashSet<string> { "exit", "echo", "type", "pwd", "cd" };
+
     // Handle the type command - identifies whether a command is builtin or external
     public static void HandleType(string input)
     {
         // Extract the command name from the input
         var split = input.Split(' ', 2);
         var command = split[1];
-        
+
         // Check if it's a built-in command
         if (builtinCommands.Contains(command))
         {
@@ -46,8 +46,8 @@ public class HandleCommands
     public static void HandleEcho(string content)
     {
         // Parse and process quotes in the content
-       
-        
+
+
         var output = Quoting.ParseQuotedString(content);
         Console.WriteLine(output);
     }
@@ -113,12 +113,12 @@ public class HandleCommands
         }
     }
 
-    private static void RunWithOutputRedirection(string content, string outputFile, Action action)
+    public static void RunWithOutputRedirection(string content, string? outputFile, Action action)
     {
         var originalOut = Console.Out;
         try
         {
-            if(outputFile != null)
+            if (outputFile != null)
             {
                 var fs = File.Create(outputFile);
                 var sw = new StreamWriter(fs) { AutoFlush = true };
@@ -128,17 +128,17 @@ public class HandleCommands
         }
         catch (Exception ex)
         {
-            Console.SetOut(originalOut);
             Console.WriteLine($"Error during output redirection: {ex.Message}");
         }
         finally
         {
-            if(outputFile != null)
+            if (outputFile != null)
             {
-                Console.Out.Close();
-                Console.SetOut(originalOut);
+                Console.Out.Flush();
+                Console.Out.Dispose();
             }
+            Console.SetOut(originalOut);
         }
     }
-    
+
 }

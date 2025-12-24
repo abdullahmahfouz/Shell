@@ -11,11 +11,11 @@ public class Quoting
         var i = 0;
         var inQuotes = false;
         var quoteChar = '\0';
-        
+
         while (i < input.Length)
         {
             var ch = input[i];
-            
+
             // Handle quote characters
             if ((ch == '\'' || ch == '\"') && !inQuotes)
             {
@@ -71,23 +71,23 @@ public class Quoting
                 i++;
             }
         }
-        
+
         // Add the last argument if any
         if (currentArg.Length > 0)
         {
             args.Add(currentArg.ToString());
         }
-        
+
         return args.ToArray();
     }
-    
+
     // Parse a string with mixed quoted and unquoted content for echo command
     // Preserves spacing INSIDE quotes, collapses spaces OUTSIDE quotes
     public static string ParseQuotedString(string input)
     {
         var result = new StringBuilder();
         var i = 0;
-        
+
         while (i < input.Length)
         {
             // Handle single quotes - preserve everything inside literally INCLUDING spaces
@@ -142,7 +142,7 @@ public class Quoting
                 i++;
             }
         }
-        
+
         // Trim trailing spaces
         return result.ToString().TrimEnd();
     }

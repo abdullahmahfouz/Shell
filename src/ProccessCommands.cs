@@ -6,14 +6,14 @@ using System.Reflection.Metadata;
 public class ProcessCommands
 {
     // Define the set of built-in shell commands that don't need to be searched in PATH
-    private static HashSet<string> builtinCommands = new HashSet<string> { "exit", "echo", "type", "pwd", "cd"};
-    
+    private static HashSet<string> builtinCommands = new HashSet<string> { "exit", "echo", "type", "pwd", "cd" };
+
     // Parse and execute the input command
     public static void ProcessCommand(string input)
     {
         // Parse the command and arguments properly handling quotes
         var parts = Quoting.ParseCommandLine(input);
-        
+
         // Return early if no command was entered
         if (parts.Length == 0) return;
 
@@ -21,9 +21,9 @@ public class ProcessCommands
         var args = parts.Skip(1).ToArray(); // Get everything after the command as arguments
 
         string? outputFile = null;
-        var  finalargs = new List<string>();
+        var finalargs = new List<string>();
 
-        for(int i =0; i < args.Length; i++)
+        for (int i = 0; i < args.Length; i++)
         {
             if (args[i] == ">")
             {
@@ -49,16 +49,33 @@ public class ProcessCommands
         // Handle echo command - prints arguments to console
         else if (command == "echo")
         {
-            // For echo, use the raw content after "echo " to preserve spacing
-            HandleCommands.HandleEcho(input.Length > 5 ? input.Substring(5) : "");
+            // Rebuild echo content without the redirection tokens
+            var echoContent = string.Join(" ", args);
+            if (outputFile != null)
+            {
+                HandleCommands.RunWithOutputRedirection(input, outputFile, () => HandleCommands.HandleEcho(echoContent));
+            }
+            else
+            {
+                HandleCommands.HandleEcho(echoContent);
+            }
         }
         // Handle type command - displays information about a command
         else if (command == "type")
         {
-            // Pass the full original string to the existing handler
-            HandleCommands.HandleType(input);
+            // Build a clean input without redirection to avoid confusing the handler
+            var typeInput = args.Length > 0 ? $"type {string.Join(" ", args)}" : "type";
+            if (outputFile != null)
+            {
+                HandleCommands.RunWithOutputRedirection(input, outputFile, () => HandleCommands.HandleType(typeInput));
+            }
+            else
+            {
+                HandleCommands.HandleType(typeInput);
+            }
         }
-        else if (command == "pwd"){
+        else if (command == "pwd")
+        {
             // Print the current working directory
             HandleCommands.HandlePwd(outputFile);
         }
@@ -70,19 +87,26 @@ public class ProcessCommands
         // Handle cat command - concatenate and display file contents
         else if (command == "cat")
         {
-            HandleCommands.HandleCat(args);
+            if (outputFile != null)
+            {
+                HandleCommands.RunWithOutputRedirection(input, outputFile, () => HandleCommands.HandleCat(args));
+            }
+            else
+            {
+                HandleCommands.HandleCat(args);
+            }
         }
-        else 
+        else
         {
             // EXTERNAL PROGRAM LOGIC
             // Try to find the command in PATH directories
             string? programPath = ProcessRunner.FindInPath(command);
-            
+
             if (programPath != null)
             {
                 // Execute the external program with provided arguments
                 // Pass both the full path and the original command name
-                ProcessRunner.RunExternalProgram(programPath, command, args);
+                ProcessRunner.RunExternalProgram(programPath, command, args, outputFile);
             }
             else
             {
