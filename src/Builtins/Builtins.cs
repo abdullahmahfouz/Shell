@@ -63,11 +63,11 @@ public static class Builtins
             }
             catch (FileNotFoundException)
             {
-                Console.WriteLine($"cat: {filePath}: No such file or directory");
+                Console.Error.WriteLine($"cat: {filePath}: No such file or directory");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"cat: {filePath}: {ex.Message}");
+                Console.Error.WriteLine($"cat: {filePath}: {ex.Message}");
             }
         }
     }
