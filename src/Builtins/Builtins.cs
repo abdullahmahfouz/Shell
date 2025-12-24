@@ -38,8 +38,8 @@ public static class Builtins
 
     public static void HandleEcho(string content)
     {
-        var output = Quoting.ParseQuotedString(content);
-        Console.WriteLine(output);
+        // Content is already unquoted/escaped by the command-line parser, so just echo it.
+        Console.WriteLine(content);
     }
 
     public static void HandleCat(string[] args)
