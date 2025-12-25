@@ -3,32 +3,32 @@ using System.IO;
 
 public static class OutputRedirection
 {
-    public static void RunWithOutputRedirection(string? outputFile, Action action)
-    {
-        var originalOut = Console.Out;
-        try
+    public static void RunWithOutputRedirection(Command command, Action action)
         {
-            if (outputFile != null)
+            var originalOut = Console.Out;
+            StreamWriter outWriter = null;
+            try
             {
-                var fs = File.Create(outputFile);
-                var sw = new StreamWriter(fs) { AutoFlush = true };
-                Console.SetOut(sw);
+                if (command.OutputFile != null)
+                {
+                   outWriter = new StreamWriter(command.OutputFile, false) { AutoFlush = true };
+                   Console.SetOut(outWriter);
+                }
+    
+                action();
             }
-
-            action();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error during output redirection: {ex.Message}");
-        }
-        finally
-        {
-            if (outputFile != null)
+            catch (Exception ex)
             {
-                Console.Out.Flush();
-                Console.Out.Dispose();
+                Console.WriteLine($"Error during output redirection: {ex.Message}");
             }
-            Console.SetOut(originalOut);
+            finally
+            {
+                if (outWriter != null)
+                {
+                    Console.Out.Flush();
+                    outWriter.Dispose();
+                }
+                Console.SetOut(originalOut);
+            }
         }
-    }
 }

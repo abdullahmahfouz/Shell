@@ -37,7 +37,7 @@ public class ProcessRunner
         }
     }
 
-    public static void RunExternalProgram(string path, string commandName, string[] args, string? outputFile = null, string? errorFile = null)
+    public static void RunExternalProgram(string path, string commandName, string[] args, string? outputFile = null, string? errorFile = null, bool appendOutput = false)
     {
         var startInfo = new ProcessStartInfo
         {
@@ -49,6 +49,13 @@ public class ProcessRunner
         var escapedPath = path.Replace("'", "'\\''");
         var escapedArgs = args.Select(a => $"'{a.Replace("'", "'\\''")}'");
         var commandLine = $"exec -a '{escapedCommandName}' '{escapedPath}' {string.Join(" ", escapedArgs)}";
+
+        if (outputFile != null)
+        {
+        // Use the flag to choose the operator
+        string redirectOp = appendOutput ? ">>" : ">";
+        commandLine += $" {redirectOp} '{outputFile}'";
+        }
 
         if (outputFile != null)
         {

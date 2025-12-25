@@ -17,11 +17,32 @@ public static class CommandLineParser
 
         string? outputFile = null;
         string? errorFile = null;
+        var appendFile = false;
         var finalArgs = new List<string>();
 
         for (var i = 0; i < args.Length; i++)
         {
             var arg = args[i];
+
+            if( arg == ">>" || arg == "1>>"){
+                appendFile = true;
+                if (i + 1 < args.Length){
+                    outputFile = args[i + 1];
+                    i++; // skip the filename token
+                    continue;   
+                }
+            }
+
+            if( arg.StartsWith(">>") || arg.StartsWith("1>>")){
+                appendFile = true;
+                var trimmed = arg.StartsWith("1>>") ? arg.Substring(3) : arg.Substring(2);
+                if (!string.IsNullOrEmpty(trimmed)){
+                    outputFile = trimmed;
+                    continue;   
+                }
+            }
+
+         
 
             // Handle stdout redirection tokens: ">", "1>", and no-space forms like ">/tmp/file" or "1>/tmp/file"
             if (arg == ">" || arg == "1>")
@@ -59,6 +80,8 @@ public static class CommandLineParser
             finalArgs.Add(arg);
         }
 
-        return new Command(command, finalArgs.ToArray(), outputFile, errorFile, input);
+        var redirectionOp = appendFile ? ">>" : ">";
+        
+        return new Command(command, finalArgs.ToArray(), outputFile, redirectionOp, errorFile, input);
     }
 }
