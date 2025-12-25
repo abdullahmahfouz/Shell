@@ -1,13 +1,19 @@
 using System;
 using System.IO;
 
+/// <summary>Routes commands to builtin handlers or external program execution</summary>
+
 public class ProcessCommands
 {
+    /// <summary>Processes a command line input</summary>
+    /// <param name="input">The raw command line input</param>
     public static void ProcessCommand(string input)
     {
         var command = CommandLineParser.Parse(input);
-        if (command == null) return;
+        if (command == null)
+            return;
 
+        // Route command to appropriate handler
         switch (command.Name)
         {
             case "exit":
@@ -15,53 +21,63 @@ public class ProcessCommands
                 break;
 
             case "echo":
-            {
                 var echoContent = string.Join(" ", command.Args);
-                // Builtin echo supports optional stdout/stderr redirection
                 RunWithRedirections(command, () => Builtins.HandleEcho(echoContent));
                 break;
-            }
 
             case "type":
-            {
-                var typeInput = command.Args.Length > 0 ? $"type {string.Join(" ", command.Args)}" : "type";
-                // Builtin type prints info about builtins or PATH lookups
+                var typeInput = command.Args.Length > 0 
+                    ? $"type {string.Join(" ", command.Args)}" 
+                    : "type";
                 RunWithRedirections(command, () => Builtins.HandleType(typeInput));
                 break;
-            }
 
             case "pwd":
-                // Builtin pwd prints current directory (optionally redirected)
                 RunWithRedirections(command, () => Builtins.HandlePwd(command.OutputFile));
                 break;
 
             case "cd":
-                // cd affects current process; no redirection support needed
                 Navigation.ChangeDir(command.Args);
                 break;
 
             case "cat":
-                // cat reads files/stdin; allow redirection for stdout/stderr
                 RunWithRedirections(command, () => Builtins.HandleCat(command.Args));
                 break;
 
             default:
-            {
-                var programPath = ProcessRunner.FindInPath(command.Name);
-                if (programPath != null)
-                {
-                    // External: run via PATH resolution with exec -a so argv[0] = command name
-                    ProcessRunner.RunExternalProgram(programPath, command.Name, command.Args, command.OutputFile, command.ErrorFile, command.AppendOutput);
-                }
-                else
-                {
-                    Console.WriteLine($"{command.Name}: command not found");
-                }
+                HandleExternalCommand(command);
                 break;
-            }
         }
     }
 
+    //------------------------------------------------------------------------------------------------------
+
+    /// <summary>Executes external programs from PATH</summary>
+    /// <param name="command">The command to execute</param>
+    private static void HandleExternalCommand(Command command)
+    {
+        var programPath = ProcessRunner.FindInPath(command.Name);
+        if (programPath != null)
+        {
+            ProcessRunner.RunExternalProgram(
+                programPath,
+                command.Name,
+                command.Args,
+                command.OutputFile,
+                command.ErrorFile,
+                command.AppendOutput);
+        }
+        else
+        {
+            Console.WriteLine($"{command.Name}: command not found");
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------
+
+    /// <summary>Executes a builtin command with optional I/O redirection</summary>
+    /// <param name="command">The command with redirection info</param>
+    /// <param name="action">The builtin action to execute</param>
     private static void RunWithRedirections(Command command, Action action)
     {
         var originalOut = Console.Out;
@@ -71,6 +87,7 @@ public class ProcessCommands
 
         try
         {
+            // Redirect stdout if specified
             if (command.OutputFile != null)
             {
                 var fileMode = command.AppendOutput ? FileMode.Append : FileMode.Create;
@@ -79,6 +96,7 @@ public class ProcessCommands
                 Console.SetOut(outWriter);
             }
 
+            // Redirect stderr if specified
             if (command.ErrorFile != null)
             {
                 var fileMode = command.AppendOutput ? FileMode.Append : FileMode.Create;
@@ -87,11 +105,12 @@ public class ProcessCommands
                 Console.SetError(errWriter);
             }
 
+            // Execute the action with redirected output
             action();
         }
         finally
         {
-            // Flush/close redirected streams then restore console streams
+            // Restore original streams
             errWriter?.Dispose();
             outWriter?.Dispose();
             Console.SetOut(originalOut);

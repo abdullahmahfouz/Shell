@@ -1,12 +1,16 @@
 using System;
 using System.IO;
 
+/// <summary>Handles directory navigation for cd and pwd commands</summary>
 public class Navigation
 {
+    /// <summary>Changes the current working directory</summary>
+    /// <param name="args">Directory path to change to, or empty for home directory</param>
     public static void ChangeDir(string[] args)
     {
         var homeDir = Environment.GetEnvironmentVariable("HOME");
 
+        // No arguments: go to home directory
         if (args.Length == 0)
         {
             if (homeDir != null)
@@ -22,6 +26,7 @@ public class Navigation
 
         var path = args[0];
 
+        // Handle ~ expansion
         if (path == "~")
         {
             if (homeDir != null)
@@ -35,6 +40,7 @@ public class Navigation
             }
         }
 
+        // Change directory with error handling
         try
         {
             Directory.SetCurrentDirectory(path);
@@ -49,5 +55,9 @@ public class Navigation
         }
     }
 
+    //------------------------------------------------------------------------------------------------------
+
+    /// <summary>Returns the current working directory</summary>
+    /// <returns>The absolute path of the current directory</returns>
     public static string GetCurrentDirectory() => Directory.GetCurrentDirectory();
 }

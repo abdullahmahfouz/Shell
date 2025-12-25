@@ -1,9 +1,12 @@
 using System.Text;
 using System.Collections.Generic;
 
+/// <summary>Handles parsing of quoted strings and command-line arguments</summary>
 public class Quoting
 {
-    // Parse command line into array of arguments, respecting quotes
+    /// <summary>Parses command line into arguments (handles quotes, escapes, and spaces)</summary>
+    /// <param name="input">The command line string to parse</param>
+    /// <returns>An array of parsed arguments</returns>
     public static string[] ParseCommandLine(string input)
     {
         var args = new List<string>();
@@ -16,21 +19,26 @@ public class Quoting
         {
             var ch = input[i];
 
-            // Handle quote characters
+            // Start of quoted string
             if ((ch == '\'' || ch == '"') && !inQuotes)
             {
                 inQuotes = true;
                 quoteChar = ch;
                 i++;
+                continue;
             }
-            else if (inQuotes && ch == quoteChar)
+
+            // End of quoted string
+            if (inQuotes && ch == quoteChar)
             {
                 inQuotes = false;
                 quoteChar = '\0';
                 i++;
+                continue;
             }
-            // Handle spaces - delimit arguments when not in quotes
-            else if (ch == ' ' && !inQuotes)
+
+            // Space outside quotes ends argument
+            if (ch == ' ' && !inQuotes)
             {
                 if (currentArg.Length > 0)
                 {
@@ -38,41 +46,36 @@ public class Quoting
                     currentArg.Clear();
                 }
                 i++;
+                continue;
             }
-            // Handle backslash escapes outside quotes
-            else if (ch == '\\' && i + 1 < input.Length && !inQuotes)
+
+            // Backslash escape outside quotes (escapes next char literally)
+            if (ch == '\\' && i + 1 < input.Length && !inQuotes)
             {
                 i++;
                 currentArg.Append(input[i]);
                 i++;
+                continue;
             }
-            // Handle backslash escapes inside double quotes (but not single quotes)
-            // Only escape specific characters: ", \\, $, `
-            else if (ch == '\\' && i + 1 < input.Length && inQuotes && quoteChar == '"')
+
+            // Backslash inside double quotes (selective escape)
+            if (ch == '\\' && i + 1 < input.Length && inQuotes && quoteChar == '"')
             {
                 char nextChar = input[i + 1];
                 if (nextChar == '"' || nextChar == '\\' || nextChar == '$' || nextChar == '`')
                 {
-                    i++; // Skip backslash
+                    i++;
                     currentArg.Append(nextChar);
                     i++;
-                }
-                else
-                {
-                    // For other characters, preserve the backslash
-                    currentArg.Append(ch);
-                    i++;
+                    continue;
                 }
             }
+
             // Regular character
-            else
-            {
-                currentArg.Append(ch);
-                i++;
-            }
+            currentArg.Append(ch);
+            i++;
         }
 
-        // Add the last argument if any
         if (currentArg.Length > 0)
         {
             args.Add(currentArg.ToString());
@@ -81,8 +84,11 @@ public class Quoting
         return args.ToArray();
     }
 
-    // Parse a string with mixed quoted and unquoted content for echo command
-    // Preserves spacing INSIDE quotes, collapses spaces OUTSIDE quotes
+    //------------------------------------------------------------------------------------------------------
+
+    /// <summary>Parses strings for echo (preserves spaces in quotes, collapses outside)</summary>
+    /// <param name="input">The string to parse</param>
+    /// <returns>The parsed string with proper quote handling</returns>
     public static string ParseQuotedString(string input)
     {
         var result = new StringBuilder();
@@ -90,69 +96,68 @@ public class Quoting
 
         while (i < input.Length)
         {
-            // Handle single quotes - preserve everything inside literally INCLUDING spaces
+            // Single quoted string (literal)
             if (input[i] == '\'')
             {
-                i++; // Skip opening quote
-                // Find closing quote and copy everything in between
+                i++;
                 while (i < input.Length && input[i] != '\'')
                 {
                     result.Append(input[i]);
                     i++;
                 }
-                i++; // Skip closing quote
+                if (i < input.Length) i++;  // Skip closing quote
+                continue;
             }
-            // Handle double quotes - preserve spaces, allow backslash escapes
-            else if (input[i] == '"')
+
+            // Double quoted string (with selective escape)
+            if (input[i] == '"')
             {
-                i++; // Skip opening quote
-                // Find closing quote, handle backslash escapes
+                i++;
                 while (i < input.Length && input[i] != '"')
                 {
                     if (input[i] == '\\' && i + 1 < input.Length)
                     {
                         var next = input[i + 1];
-                        // In double quotes, only escape " \ $ `
                         if (next == '"' || next == '\\' || next == '$' || next == '`')
                         {
-                            i++; // Skip backslash
+                            i++;
                             result.Append(input[i]);
                             i++;
                             continue;
                         }
-                        // Otherwise, keep the backslash
                     }
                     result.Append(input[i]);
                     i++;
                 }
-                i++; // Skip closing quote
+                if (i < input.Length) i++;  // Skip closing quote
+                continue;
             }
-            // Handle spaces OUTSIDE quotes - collapse multiple spaces to single space
-            else if (input[i] == ' ')
+
+            // Multiple spaces collapse to one outside quotes
+            if (input[i] == ' ')
             {
-                // Add single space only if not at start and previous char wasn't a space
                 if (result.Length > 0 && result[result.Length - 1] != ' ')
                 {
                     result.Append(' ');
                 }
                 i++;
+                continue;
             }
-            // Handle backslash escapes outside quotes
-            else if (input[i] == '\\' && i + 1 < input.Length)
+
+            // Backslash escape outside quotes
+            if (input[i] == '\\' && i + 1 < input.Length)
             {
-                i++; // Skip backslash
+                i++;
                 result.Append(input[i]);
                 i++;
+                continue;
             }
-            // Regular character - copy as is
-            else
-            {
-                result.Append(input[i]);
-                i++;
-            }
+
+            // Regular character
+            result.Append(input[i]);
+            i++;
         }
 
-        // Trim trailing spaces
         return result.ToString().TrimEnd();
     }
 }
