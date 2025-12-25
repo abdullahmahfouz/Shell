@@ -5,7 +5,7 @@ using System.IO;
 /// <summary>Implements shell built-in commands</summary>
 public static class Builtins
 {
-    private static readonly HashSet<string> BuiltinCommands = new HashSet<string>
+    public static readonly HashSet<string> BuiltinCommands = new HashSet<string>
     {
         "exit", "echo", "type", "pwd", "cd"
     };

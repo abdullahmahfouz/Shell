@@ -1,0 +1,83 @@
+using System.Text;
+
+/// <summary>
+/// Handles Tab auto-completion for shell commands.
+/// Provides custom input reading with support for:
+/// - Tab completion for built-in commands
+/// - Backspace handling
+/// - Character-by-character input processing
+/// </summary>
+public class AutoCompletion
+{
+    /// <summary>
+    /// Reads user input character by character with Tab auto-completion support.
+    /// Uses Console.ReadKey(intercept: true) to capture keys without displaying them,
+    /// giving full control over what appears on screen.
+    /// </summary>
+    /// <returns>The complete input string when Enter is pressed</returns>
+    public static string ReadInput()
+    {
+        // Buffer to accumulate typed characters
+        StringBuilder stringBuilder = new StringBuilder();
+        
+        // Get list of built-in commands for auto-completion
+        var builtins = Builtins.BuiltinCommands;
+        
+        // Main input loop - runs until Enter is pressed
+        while (true)
+        { 
+            // Read a key without displaying it (intercept: true)
+            ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
+
+            // 1. Handle ENTER key - submit the input
+            if (keyInfo.Key == ConsoleKey.Enter)
+            {
+                Console.WriteLine();              // Move to new line
+                return stringBuilder.ToString();  // Return the accumulated input
+            }
+            
+            // 2. Handle TAB key - auto-complete commands
+            else if (keyInfo.Key == ConsoleKey.Tab)
+            {
+                // Get what the user has typed so far
+                string currentInput = stringBuilder.ToString();
+
+                // Find all built-in commands that start with the current input
+                var matches = builtins.Where(b => b.StartsWith(currentInput)).ToList();
+
+                // Only auto-complete if there's exactly one match (no ambiguity)
+                if (matches.Count == 1)
+                {
+                    string match = matches[0];
+
+                    // Calculate the remaining part to complete + trailing space
+                    // Example: typed "ec", match "echo" → remainder = "ho "
+                    string remainder = match.Substring(currentInput.Length) + " ";
+                    
+                    // Display the completion on screen
+                    Console.Write(remainder);
+                    
+                    // Add completion to the internal buffer
+                    stringBuilder.Append(remainder);
+                }
+            }
+            
+            // 3. Handle BACKSPACE key - delete last character
+            else if (keyInfo.Key == ConsoleKey.Backspace)
+            {
+                if (stringBuilder.Length > 0)
+                {
+                    stringBuilder.Length--;  // Remove last char from buffer
+                    Console.Write("\b \b");  // Move back, overwrite with space, move back again
+                }
+            }
+            
+            // 4. Handle NORMAL CHARACTERS - add to input
+            else if (!char.IsControl(keyInfo.KeyChar))
+            {
+                stringBuilder.Append(keyInfo.KeyChar);  // Add to buffer
+                Console.Write(keyInfo.KeyChar);         // Display on screen
+            }
+        }
+    }
+}

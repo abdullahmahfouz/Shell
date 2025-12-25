@@ -1,4 +1,6 @@
 using System;
+using System.Text;
+using System.Collections.Generic;
 
 /// <summary>Main shell REPL (Read-Eval-Print Loop)</summary>
 class Program
@@ -10,11 +12,12 @@ class Program
         {
             // Display prompt
             Console.Write("$ ");
-            
+          
             // Read user input
-            var input = Console.ReadLine();
+            var input = AutoCompletion.ReadInput();
             if (input != null)
             {
+
                 // Process the command
                 ProcessCommands.ProcessCommand(input);
             }
