@@ -73,13 +73,17 @@ public class ProcessCommands
         {
             if (command.OutputFile != null)
             {
-                outWriter = new StreamWriter(command.OutputFile) { AutoFlush = true };
+                var fileMode = command.AppendOutput ? FileMode.Append : FileMode.Create;
+                var stream = new FileStream(command.OutputFile, fileMode, FileAccess.Write);
+                outWriter = new StreamWriter(stream) { AutoFlush = true };
                 Console.SetOut(outWriter);
             }
 
             if (command.ErrorFile != null)
             {
-                errWriter = new StreamWriter(command.ErrorFile) { AutoFlush = true };
+                var fileMode = command.AppendOutput ? FileMode.Append : FileMode.Create;
+                var stream = new FileStream(command.ErrorFile, fileMode, FileAccess.Write);
+                errWriter = new StreamWriter(stream) { AutoFlush = true };
                 Console.SetError(errWriter);
             }
 
