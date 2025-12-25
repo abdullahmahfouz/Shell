@@ -24,25 +24,28 @@ public static class CommandLineParser
         {
             var arg = args[i];
 
-            if( arg == ">>" || arg == "1>>"){
+            // Check append operators BEFORE truncate to avoid "1>>" being matched by "1>" check
+            if (arg == ">>" || arg == "1>>")
+            {
                 appendFile = true;
-                if (i + 1 < args.Length){
+                if (i + 1 < args.Length)
+                {
                     outputFile = args[i + 1];
                     i++; // skip the filename token
-                    continue;   
                 }
+                continue;
             }
 
-            if( arg.StartsWith(">>") || arg.StartsWith("1>>")){
+            if (arg.StartsWith(">>") || arg.StartsWith("1>>"))
+            {
                 appendFile = true;
                 var trimmed = arg.StartsWith("1>>") ? arg.Substring(3) : arg.Substring(2);
-                if (!string.IsNullOrEmpty(trimmed)){
+                if (!string.IsNullOrEmpty(trimmed))
+                {
                     outputFile = trimmed;
-                    continue;   
+                    continue;
                 }
             }
-
-         
 
             // Handle stdout redirection tokens: ">", "1>", and no-space forms like ">/tmp/file" or "1>/tmp/file"
             if (arg == ">" || arg == "1>")
@@ -55,7 +58,7 @@ public static class CommandLineParser
                 continue;
             }
 
-            if (arg.StartsWith(">") || arg.StartsWith("1>"))
+            if (arg.StartsWith(">") && !arg.StartsWith(">>"))
             {
                 var trimmed = arg.StartsWith("1>") ? arg.Substring(2) : arg.Substring(1);
                 if (!string.IsNullOrEmpty(trimmed))
