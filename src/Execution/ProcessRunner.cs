@@ -37,7 +37,7 @@ public class ProcessRunner
         }
     }
 
-    public static void RunExternalProgram(string path, string commandName, string[] args, string? outputFile = null)
+    public static void RunExternalProgram(string path, string commandName, string[] args, string? outputFile = null, string? errorFile = null)
     {
         var startInfo = new ProcessStartInfo
         {
@@ -53,6 +53,10 @@ public class ProcessRunner
         if (outputFile != null)
         {
             commandLine += $" > '{outputFile}'";
+        }
+        if (errorFile != null)
+        {
+            commandLine += $" 2> '{errorFile}'";
         }
 
         startInfo.ArgumentList.Add("-c");

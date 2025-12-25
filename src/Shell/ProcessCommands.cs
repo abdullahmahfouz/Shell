@@ -50,8 +50,8 @@ public class ProcessCommands
                 var programPath = ProcessRunner.FindInPath(command.Name);
                 if (programPath != null)
                 {
-                    // External: run via PATH resolution with optional redirection
-                    ProcessRunner.RunExternal(programPath, command.Args, command.OutputFile, command.ErrorFile);
+                    // External: run via PATH resolution with exec -a so argv[0] = command name
+                    ProcessRunner.RunExternalProgram(programPath, command.Name, command.Args, command.OutputFile, command.ErrorFile);
                 }
                 else
                 {
