@@ -13,14 +13,18 @@ public static class OutputRedirection
         {
             if (command.OutputFile != null)
             {
-                // append mode if AppendOutput is true
-                outWriter = new StreamWriter(command.OutputFile, command.AppendOutput) { AutoFlush = true };
+                // Use FileMode.Append or FileMode.Create based on AppendOutput flag
+                var fileMode = command.AppendOutput ? FileMode.Append : FileMode.Create;
+                var stream = new FileStream(command.OutputFile, fileMode, FileAccess.Write);
+                outWriter = new StreamWriter(stream) { AutoFlush = true };
                 Console.SetOut(outWriter);
             }
 
             if (command.ErrorFile != null)
             {
-                errWriter = new StreamWriter(command.ErrorFile, command.AppendOutput) { AutoFlush = true };
+                var fileMode = command.AppendOutput ? FileMode.Append : FileMode.Create;
+                var stream = new FileStream(command.ErrorFile, fileMode, FileAccess.Write);
+                errWriter = new StreamWriter(stream) { AutoFlush = true };
                 Console.SetError(errWriter);
             }
 
