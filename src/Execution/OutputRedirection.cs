@@ -8,6 +8,7 @@ public static class OutputRedirection
     /// <summary>Executes action with stdout/stderr redirected to files</summary>
     /// <param name="command">The command with redirection info</param>
     /// <param name="action">The action to execute with redirected output</param>
+   
     public static void RunWithOutputRedirection(Command command, Action action)
     {
         var originalOut = Console.Out;

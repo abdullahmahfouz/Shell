@@ -35,7 +35,7 @@ public class ProcessRunner
     /// <summary>Checks if a file has execute permissions on Unix-like systems</summary>
     /// <param name="path">The path to the file to check</param>
     /// <returns>True if the file has any execute permission bit set, false otherwise</returns>
-    private static bool IsExecutable(string path)
+    public static bool IsExecutable(string path)
     {
         try
         {

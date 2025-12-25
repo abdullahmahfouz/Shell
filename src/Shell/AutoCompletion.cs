@@ -44,12 +44,20 @@ public class AutoCompletion
 
                 // Find all built-in commands that start with the current input
                 var matches = builtins.Where(b => b.StartsWith(currentInput)).ToList();
-
+                var externalMatches = SearchPath.Search(currentInput)
+                    .Where(b => b.StartsWith(currentInput)).ToList();
+                var allMatches = new HashSet<string>(matches);
+                
+                foreach (var match in externalMatches){
+                    allMatches.Add(match);
+                }
+                
+                var matchList = allMatches.OrderBy(m => m).ToList();
+                
                 // Only auto-complete if there's exactly one match (no ambiguity)
-                if (matches.Count == 1)
+                if (matchList.Count == 1)
                 {
-                    string match = matches[0];
-
+                    string match = matchList[0];
                     // Calculate the remaining part to complete + trailing space
                     // Example: typed "ec", match "echo" → remainder = "ho "
                     string remainder = match.Substring(currentInput.Length) + " ";
@@ -60,6 +68,8 @@ public class AutoCompletion
                     // Add completion to the internal buffer
                     stringBuilder.Append(remainder);
                 }
+               
+                
                 else{
                     Console.Write('\a'); // Beep to indicate no unique match
                 }
@@ -83,4 +93,6 @@ public class AutoCompletion
             }
         }
     }
+
+    
 }
