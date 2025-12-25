@@ -60,6 +60,9 @@ public class AutoCompletion
                     // Add completion to the internal buffer
                     stringBuilder.Append(remainder);
                 }
+                else{
+                    Console.Write('\a'); // Beep to indicate no unique match
+                }
             }
             
             // 3. Handle BACKSPACE key - delete last character
