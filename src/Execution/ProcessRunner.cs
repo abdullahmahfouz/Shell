@@ -52,14 +52,8 @@ public class ProcessRunner
 
         if (outputFile != null)
         {
-        // Use the flag to choose the operator
-        string redirectOp = appendOutput ? ">>" : ">";
-        commandLine += $" {redirectOp} '{outputFile}'";
-        }
-
-        if (outputFile != null)
-        {
-            commandLine += $" > '{outputFile}'";
+            string redirectOp = appendOutput ? ">>" : ">";
+            commandLine += $" {redirectOp} '{outputFile}'";
         }
         if (errorFile != null)
         {

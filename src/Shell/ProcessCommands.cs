@@ -51,7 +51,7 @@ public class ProcessCommands
                 if (programPath != null)
                 {
                     // External: run via PATH resolution with exec -a so argv[0] = command name
-                    ProcessRunner.RunExternalProgram(programPath, command.Name, command.Args, command.OutputFile, command.ErrorFile);
+                    ProcessRunner.RunExternalProgram(programPath, command.Name, command.Args, command.OutputFile, command.ErrorFile, command.AppendOutput);
                 }
                 else
                 {

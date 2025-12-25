@@ -80,8 +80,6 @@ public static class CommandLineParser
             finalArgs.Add(arg);
         }
 
-        var redirectionOp = appendFile ? ">>" : ">";
-        
-        return new Command(command, finalArgs.ToArray(), outputFile, redirectionOp, errorFile, input);
+        return new Command(command, finalArgs.ToArray(), outputFile, errorFile, input, appendFile);
     }
 }

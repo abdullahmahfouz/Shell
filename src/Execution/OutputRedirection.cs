@@ -4,31 +4,40 @@ using System.IO;
 public static class OutputRedirection
 {
     public static void RunWithOutputRedirection(Command command, Action action)
+    {
+        var originalOut = Console.Out;
+        var originalErr = Console.Error;
+        StreamWriter? outWriter = null;
+        StreamWriter? errWriter = null;
+        try
         {
-            var originalOut = Console.Out;
-            StreamWriter outWriter = null;
-            try
+            if (command.OutputFile != null)
             {
-                if (command.OutputFile != null)
-                {
-                   outWriter = new StreamWriter(command.OutputFile, false) { AutoFlush = true };
-                   Console.SetOut(outWriter);
-                }
-    
-                action();
+                // append mode if AppendOutput is true
+                outWriter = new StreamWriter(command.OutputFile, command.AppendOutput) { AutoFlush = true };
+                Console.SetOut(outWriter);
             }
-            catch (Exception ex)
+
+            if (command.ErrorFile != null)
             {
-                Console.WriteLine($"Error during output redirection: {ex.Message}");
+                errWriter = new StreamWriter(command.ErrorFile, command.AppendOutput) { AutoFlush = true };
+                Console.SetError(errWriter);
             }
-            finally
-            {
-                if (outWriter != null)
-                {
-                    Console.Out.Flush();
-                    outWriter.Dispose();
-                }
-                Console.SetOut(originalOut);
-            }
+
+            action();
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during output redirection: {ex.Message}");
+        }
+        finally
+        {
+            outWriter?.Flush();
+            outWriter?.Dispose();
+            errWriter?.Flush();
+            errWriter?.Dispose();
+            Console.SetOut(originalOut);
+            Console.SetError(originalErr);
+        }
+    }
 }

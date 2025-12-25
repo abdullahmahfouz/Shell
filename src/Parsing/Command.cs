@@ -8,15 +8,15 @@ public class Command
     public string? OutputFile { get; }
     public string? ErrorFile { get; }
     public string? RawInput { get; }
-    public string? AppendFile { get; }
+    public bool AppendOutput { get; }
 
-    public Command(string name, string[] args, string? outputFile, string? errorFile, string? rawInput, string? appendFile)
+    public Command(string name, string[] args, string? outputFile, string? errorFile, string? rawInput, bool appendOutput = false)
     {
         Name = name;
         Args = args;
         OutputFile = outputFile;
         ErrorFile = errorFile;
         RawInput = rawInput;
-        AppendFile = appendFile;
+        AppendOutput = appendOutput;
     }
 }
