@@ -50,6 +50,7 @@ public static class CommandLineParser
             // Handle stdout redirection tokens: ">", "1>", and no-space forms like ">/tmp/file" or "1>/tmp/file"
             if (arg == ">" || arg == "1>")
             {
+                appendFile = false;  // Reset to truncate mode
                 if (i + 1 < args.Length)
                 {
                     outputFile = args[i + 1];
@@ -60,6 +61,7 @@ public static class CommandLineParser
 
             if (arg.StartsWith(">") && !arg.StartsWith(">>"))
             {
+                appendFile = false;  // Reset to truncate mode
                 var trimmed = arg.StartsWith("1>") ? arg.Substring(2) : arg.Substring(1);
                 if (!string.IsNullOrEmpty(trimmed))
                 {
