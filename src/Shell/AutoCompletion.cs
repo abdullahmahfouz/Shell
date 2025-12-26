@@ -77,12 +77,11 @@ public class AutoCompletion
                     if(lastKeyWasTab){
                         Console.WriteLine();
                         
-                        foreach (var m in matchList){
-                            
-                            Console.WriteLine(m);
-                        }
-                        // Re-display the current input prompt
-                        Console.Write(currentInput);
+                        // Print all matches on one line, separated by double spaces
+                        Console.WriteLine(string.Join("  ", matchList));
+                        
+                        // Re-display the prompt with current input
+                        Console.Write($"$ {currentInput}");
                     }
                     else{
                         Console.Write('\a'); // Beep to indicate no unique match
