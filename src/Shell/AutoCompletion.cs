@@ -89,7 +89,7 @@ public class AutoCompletion
                 
                 else{
                     Console.Write('\a'); // Beep to indicate no unique match
-                    lastKeyWasTab = false;
+                    lastKeyWasTab = true;
                 }
             }
             
