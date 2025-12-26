@@ -84,6 +84,10 @@ public class AutoCompletion
                         // Re-display the current input prompt
                         Console.Write(currentInput);
                     }
+                    else{
+                        Console.Write('\a'); // Beep to indicate no unique match
+                        lastKeyWasTab = true;
+                    }
                 }
                
                 
@@ -101,6 +105,7 @@ public class AutoCompletion
                     stringBuilder.Length--;  // Remove last char from buffer
                     Console.Write("\b \b");  // Move back, overwrite with space, move back again
                 }
+                 lastKeyWasTab = false;
             }
             
             // 4. Handle NORMAL CHARACTERS - add to input
