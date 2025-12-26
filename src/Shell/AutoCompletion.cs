@@ -22,6 +22,9 @@ public class AutoCompletion
         
         // Get list of built-in commands for auto-completion
         var builtins = Builtins.BuiltinCommands;
+
+        bool lastKeyWasTab = false;
+
         
         // Main input loop - runs until Enter is pressed
         while (true)
@@ -68,10 +71,25 @@ public class AutoCompletion
                     // Add completion to the internal buffer
                     stringBuilder.Append(remainder);
                 }
+                else if  (matchList.Count > 1)
+                {
+                    // Multiple matches found - display options
+                    if(lastKeyWasTab){
+                        Console.WriteLine();
+                        
+                        foreach (var m in matchList){
+                            
+                            Console.WriteLine(m);
+                        }
+                        // Re-display the current input prompt
+                        Console.Write(currentInput);
+                    }
+                }
                
                 
                 else{
                     Console.Write('\a'); // Beep to indicate no unique match
+                    lastKeyWasTab = false;
                 }
             }
             
