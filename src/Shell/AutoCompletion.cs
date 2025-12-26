@@ -113,7 +113,10 @@ public class AutoCompletion
             {
                 stringBuilder.Append(keyInfo.KeyChar);  // Add to buffer
                 Console.Write(keyInfo.KeyChar);         // Display on screen
+                lastKeyWasTab = false; // Reset flag
             }
+            else{
+                lastKeyWasTab = false;}
         }
     }
 
