@@ -70,11 +70,23 @@ public class AutoCompletion
                     
                     // Add completion to the internal buffer
                     stringBuilder.Append(remainder);
+                    lastKeyWasTab = false;
                 }
                 else if  (matchList.Count > 1)
                 {
-                    // Multiple matches found - display options
-                    if(lastKeyWasTab){
+                    // Multiple matches - complete to longest common prefix
+                    string lcp = LongestPrefix.GetLongestCommonPrefix(matchList);
+                    
+                    if (lcp.Length > currentInput.Length)
+                    {
+                        // We can make progress - complete to LCP
+                        string remainder = lcp.Substring(currentInput.Length);
+                        Console.Write(remainder);
+                        stringBuilder.Append(remainder);
+                        lastKeyWasTab = false;
+                    }
+                    else if(lastKeyWasTab){
+                        // Second TAB - show all matches
                         Console.WriteLine();
                         
                         // Print all matches on one line, separated by double spaces
@@ -82,9 +94,11 @@ public class AutoCompletion
                         
                         // Re-display the prompt with current input
                         Console.Write($"$ {currentInput}");
+                        lastKeyWasTab = false;
                     }
                     else{
-                        Console.Write('\a'); // Beep to indicate no unique match
+                        // No progress possible, beep
+                        Console.Write('\a');
                         lastKeyWasTab = true;
                     }
                 }
