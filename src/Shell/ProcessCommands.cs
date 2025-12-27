@@ -9,9 +9,20 @@ public class ProcessCommands
     /// <param name="input">The raw command line input</param>
     public static void ProcessCommand(string input)
     {
-        var command = CommandLineParser.Parse(input);
-        if (command == null)
+        // First check if it's a pipeline
+        var pipeline = CommandLineParser.ParsePipeline(input);
+        if (pipeline == null)
             return;
+
+        // If it's a multi-command pipeline, use the pipeline runner
+        if (pipeline.IsPipeline)
+        {
+            PipelineRunner.Execute(pipeline);
+            return;
+        }
+
+        // Single command - use regular processing
+        var command = pipeline.Commands[0];
 
         // Route command to appropriate handler
         switch (command.Name)

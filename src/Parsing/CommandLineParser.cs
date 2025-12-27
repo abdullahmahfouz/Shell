@@ -5,10 +5,108 @@ using System.Linq;
 /// <summary>Parses command-line input into Command objects with quote and redirection handling</summary>
 public static class CommandLineParser
 {
+    /// <summary>Parses a command line string into a Pipeline object (handles pipe operator)</summary>
+    /// <param name="input">The raw command line input</param>
+    /// <returns>A Pipeline object with parsed commands, or null if empty</returns>
+    public static Pipeline? ParsePipeline(string input)
+    {
+        var commandStrings = SplitByPipe(input);
+        var commands = new List<Command>();
+
+        foreach (var cmdStr in commandStrings)
+        {
+            var trimmed = cmdStr.Trim();
+            if (string.IsNullOrEmpty(trimmed))
+                continue;
+
+            var cmd = ParseSingleCommand(trimmed);
+            if (cmd != null)
+            {
+                commands.Add(cmd);
+            }
+        }
+
+        if (commands.Count == 0)
+            return null;
+
+        return new Pipeline(commands);
+    }
+
+    /// <summary>Splits command line by pipe operator, respecting quotes</summary>
+    /// <param name="input">The raw command line input</param>
+    /// <returns>Array of command strings separated by pipes</returns>
+    private static string[] SplitByPipe(string input)
+    {
+        var commands = new List<string>();
+        var current = new System.Text.StringBuilder();
+        var inSingleQuote = false;
+        var inDoubleQuote = false;
+        var i = 0;
+
+        while (i < input.Length)
+        {
+            var ch = input[i];
+
+            // Handle quote state transitions
+            if (ch == '\'' && !inDoubleQuote)
+            {
+                inSingleQuote = !inSingleQuote;
+                current.Append(ch);
+                i++;
+                continue;
+            }
+
+            if (ch == '"' && !inSingleQuote)
+            {
+                inDoubleQuote = !inDoubleQuote;
+                current.Append(ch);
+                i++;
+                continue;
+            }
+
+            // Handle backslash escapes in double quotes
+            if (ch == '\\' && inDoubleQuote && i + 1 < input.Length)
+            {
+                current.Append(ch);
+                current.Append(input[i + 1]);
+                i += 2;
+                continue;
+            }
+
+            // Pipe operator outside quotes splits commands
+            if (ch == '|' && !inSingleQuote && !inDoubleQuote)
+            {
+                commands.Add(current.ToString());
+                current.Clear();
+                i++;
+                continue;
+            }
+
+            current.Append(ch);
+            i++;
+        }
+
+        // Add the last command
+        if (current.Length > 0)
+        {
+            commands.Add(current.ToString());
+        }
+
+        return commands.ToArray();
+    }
+
     /// <summary>Parses a command line string into a Command object</summary>
     /// <param name="input">The raw command line input</param>
     /// <returns>A Command object with parsed arguments and redirection info, or null if empty</returns>
     public static Command? Parse(string input)
+    {
+        return ParseSingleCommand(input);
+    }
+
+    /// <summary>Parses a single command (without pipes) into a Command object</summary>
+    /// <param name="input">The raw command line input</param>
+    /// <returns>A Command object with parsed arguments and redirection info, or null if empty</returns>
+    private static Command? ParseSingleCommand(string input)
     {
         var parts = Quoting.ParseCommandLine(input);
         
