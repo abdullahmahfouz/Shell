@@ -17,6 +17,8 @@ class Program
             var input = AutoCompletion.ReadInput();
             if (input != null)
             {
+                // Add command to history
+                History.Add(input);
 
                 // Process the command
                 ProcessCommands.ProcessCommand(input);
