@@ -20,15 +20,13 @@ public static class History
         int startIndex = 0;
         int count = commandHistory.Count;
 
-         if (limit.HasValue && limit.Value < count)
+        // If limit is specified, only show last n commands
+        if (limit.HasValue && limit.Value < count)
         {
             startIndex = count - limit.Value;
         }
-        {
-            startIndex = Math.Max(0, commandHistory.Count - limit.Value);
-            count = commandHistory.Count - startIndex;
-        }
-        for (int i = 0; i < commandHistory.Count; i++)
+
+        for (int i = startIndex; i < count; i++)
         {
             Console.WriteLine($"{i + 1,5}  {commandHistory[i]}");
         }
