@@ -1,34 +1,77 @@
-[![progress-banner](https://backend.codecrafters.io/progress/shell/1ae633ff-da21-4058-af08-e57bf50e1174)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+# My Shell 🐚
 
-This is a starting point for C# solutions to the
-["Build Your Own Shell" Challenge](https://app.codecrafters.io/courses/shell/overview).
+A simple shell I built in C#. It works like bash or zsh, but simpler!
 
-In this challenge, you'll build your own POSIX compliant shell that's capable of
-interpreting shell commands, running external programs and builtin commands like
-cd, pwd, echo and more. Along the way, you'll learn about shell command parsing,
-REPLs, builtin commands, and more.
+## What Can It Do?
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+**Run commands:**
+```
+$ echo hello world
+hello world
 
-# Passing the first stage
+$ pwd
+/Users/Abdullah
 
-The entry point for your `shell` implementation is in `src/main.cs`. Study and
-uncomment the relevant code, and push your changes to pass the first stage:
-
-```sh
-git commit -am "pass 1st stage" # any msg
-git push origin master
+$ cd /tmp
 ```
 
-Time to move on to the next stage!
+**Tab completion** - Type part of a command, press Tab:
+```
+$ ech[TAB]
+$ echo 
+```
 
-# Stage 2 & beyond
+**History** - Press Up/Down arrows to see old commands:
+```
+$ [UP ARROW]
+$ echo hello    ← your last command appears
+```
 
-Note: This section is for stages 2 and beyond.
+**Pipes** - Send output from one command to another:
+```
+$ echo hello | cat
+hello
+```
 
-1. Ensure you have `dotnet (9.0)` installed locally
-1. Run `./your_program.sh` to run your program, which is implemented in
-   `src/main.cs`.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+**Redirects** - Save output to a file:
+```
+$ echo hello > file.txt
+```
+
+## Built-in Commands
+
+| Command | What it does |
+|---------|-------------|
+| `echo text` | Prints text |
+| `pwd` | Shows current folder |
+| `cd folder` | Go to folder |
+| `cat file` | Show file contents |
+| `type cmd` | Is it builtin or external? |
+| `history` | Show all past commands |
+| `history 5` | Show last 5 commands |
+| `history -r file` | Load history from file |
+| `history -w file` | Save history to file |
+| `history -a file` | Add new commands to file |
+| `exit` | Close the shell |
+
+## How to Run
+
+```bash
+dotnet run
+```
+
+## Project Files
+
+```
+src/
+├── Builtins/        ← echo, cd, pwd, history, etc.
+├── Execution/       ← Running programs and pipes
+├── Parsing/         ← Understanding what you typed
+├── Shell/           ← Main loop and keyboard input
+└── Utils/           ← Helper stuff
+```
+
+## Built With
+
+- C# / .NET 9.0
+
