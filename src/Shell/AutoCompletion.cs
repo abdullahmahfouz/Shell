@@ -6,6 +6,7 @@ using System.Text;
 /// - Tab completion for built-in commands
 /// - Backspace handling
 /// - Character-by-character input processing
+/// - Up/Down arrow history navigation
 /// </summary>
 public class AutoCompletion
 {
@@ -24,6 +25,9 @@ public class AutoCompletion
         var builtins = Builtins.BuiltinCommands;
 
         bool lastKeyWasTab = false;
+        
+        // Reset history navigation state for new input
+        HistoryNavgation.Reset();
 
         
         // Main input loop - runs until Enter is pressed
@@ -39,7 +43,21 @@ public class AutoCompletion
                 return stringBuilder.ToString();  // Return the accumulated input
             }
             
-            // 2. Handle TAB key - auto-complete commands
+            // 2. Handle UP ARROW - navigate to previous command in history
+            else if (keyInfo.Key == ConsoleKey.UpArrow)
+            {
+                HistoryNavgation.NavigateUp(stringBuilder);
+                lastKeyWasTab = false;
+            }
+            
+            // 3. Handle DOWN ARROW - navigate to next command in history
+            else if (keyInfo.Key == ConsoleKey.DownArrow)
+            {
+                HistoryNavgation.NavigateDown(stringBuilder);
+                lastKeyWasTab = false;
+            }
+            
+            // 4. Handle TAB key - auto-complete commands
             else if (keyInfo.Key == ConsoleKey.Tab)
             {
                 // Get what the user has typed so far
