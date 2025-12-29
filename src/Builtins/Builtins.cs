@@ -7,7 +7,7 @@ public static class Builtins
 {
     public static readonly HashSet<string> BuiltinCommands = new HashSet<string>
     {
-        "exit", "echo", "type", "pwd", "cd"
+        "exit", "echo", "type", "pwd", "cd", "history"
     };
 
     /// <summary>Checks if a command is a builtin</summary>
