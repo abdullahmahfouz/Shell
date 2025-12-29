@@ -307,9 +307,16 @@ public static class PipelineRunner
                 Environment.Exit(0);
                 break;
 
-            case "history":
-                History.Print();
-                break;
+    case "history":
+        if (cmd.Args.Length > 0 && int.TryParse(cmd.Args[0], out int limit))
+        {
+            History.Print(limit);
+        }
+        else
+        {
+            History.Print();
+        }
+        break;
         }
     }
 
