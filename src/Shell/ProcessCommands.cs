@@ -57,6 +57,11 @@ public class ProcessCommands
                     // history -r <path> - read from file
                     History.ReadFromFile(command.Args[1]);
                 }
+                else if (command.Args.Length >= 2 && command.Args[0] == "-a")
+                {
+                    // history -a <path> - append to file
+                    History.WriteToFile(command.Args[1]);
+                }
                 else if (command.Args.Length > 0 && int.TryParse(command.Args[0], out int limit))
                 {
                     // history <n> - show last n entries

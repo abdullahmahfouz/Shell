@@ -28,12 +28,26 @@ public static class History
         var lines = File.ReadAllLines(filePath);
         foreach (var line in lines)
         {
-            // Only add non-empty lines
             if (!string.IsNullOrWhiteSpace(line))
             {
                 commandHistory.Add(line);
             }
         }
+    }
+
+    /// <summary>Appends all history to a file</summary>
+    /// <param name="filePath">Path to the history file</param>
+    public static void WriteToFile(string filePath)
+    {
+        // Create directory if it doesn't exist
+        var directory = Path.GetDirectoryName(filePath);
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        // Append all history entries to the file
+        File.AppendAllLines(filePath, commandHistory);
     }
 
     /// <summary>Prints history with optional limit</summary>
