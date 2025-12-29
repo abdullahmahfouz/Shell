@@ -18,7 +18,7 @@ public static class History
     {
         for (int i = 0; i < commandHistory.Count; i++)
         {
-            Console.WriteLine($"{i + 1}  {commandHistory[i]}");
+            Console.WriteLine($"{i + 1,5}  {commandHistory[i]}");
         }
     }
 

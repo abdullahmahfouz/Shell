@@ -51,6 +51,10 @@ public class ProcessCommands
                 Navigation.ChangeDir(command.Args);
                 break;
 
+            case "history":
+                RunWithRedirections(command, () => History.Print());
+                break;
+
             case "cat":
                 RunWithRedirections(command, () => Builtins.HandleCat(command.Args));
                 break;
