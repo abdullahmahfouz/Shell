@@ -13,4 +13,14 @@ public static class History
         }
         
     }
+
+    public static void Print()
+    {
+        for (int i = 0; i < commandHistory.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}  {commandHistory[i]}");
+        }
+    }
+
+    public static IReadOnlyList<string> GetHistory() => commandHistory.AsReadOnly();
 }

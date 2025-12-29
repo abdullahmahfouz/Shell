@@ -306,6 +306,10 @@ public static class PipelineRunner
             case "exit":
                 Environment.Exit(0);
                 break;
+
+            case "history":
+                History.Print();
+                break;
         }
     }
 
