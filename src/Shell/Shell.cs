@@ -5,11 +5,15 @@ using System.Collections.Generic;
 /// <summary>Main shell REPL (Read-Eval-Print Loop)</summary>
 class Program
 {
+    private static string historyFile;
+
     /// <summary>Entry point for the shell application</summary>
     static void Main(string[] args)
     {
+        // Get history file path
+        historyFile = GetHistoryFilePath();
+
         // Load history from file on startup
-        string historyFile = GetHistoryFilePath();
         if (historyFile != null)
         {
             History.ReadFromFile(historyFile);
@@ -27,9 +31,28 @@ class Program
                 // Add command to history
                 History.Add(input);
 
+                // Check for exit command
+                if (input.Trim() == "exit" || input.Trim().StartsWith("exit "))
+                {
+                    // Save history before exiting
+                    SaveHistoryOnExit();
+                    
+                    // Process the exit command (will call Environment.Exit)
+                    ProcessCommands.ProcessCommand(input);
+                }
+
                 // Process the command
                 ProcessCommands.ProcessCommand(input);
             }
+        }
+    }
+
+    /// <summary>Saves history to file before exiting</summary>
+    private static void SaveHistoryOnExit()
+    {
+        if (historyFile != null)
+        {
+            History.AppendToFile(historyFile);
         }
     }
 
