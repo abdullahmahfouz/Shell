@@ -52,7 +52,12 @@ public class ProcessCommands
                 break;
 
             case "history":
-                RunWithRedirections(command, () => History.Print());
+                int? limit = null;
+                if (command.Args.Length > 0 && int.TryParse(command.Args[0], out int n))
+                {
+                    limit = n;
+                }
+                RunWithRedirections(command, () => History.Print(limit));
                 break;
 
             case "cat":
