@@ -59,22 +59,20 @@ public class ProcessCommands
                 }
                 else if (command.Args.Length >= 2 && command.Args[0] == "-w")
                 {
-                    // history -w <path> - write to file (silent, no output)
+                    // history -w <path> - WRITE (overwrite) to file
                     History.WriteToFile(command.Args[1]);
                 }
                 else if (command.Args.Length >= 2 && command.Args[0] == "-a")
                 {
-                    // history -a <path> - append to file (silent, no output)
-                    History.WriteToFile(command.Args[1]);
+                    // history -a <path> - APPEND to file
+                    History.AppendToFile(command.Args[1]);
                 }
                 else if (command.Args.Length > 0 && int.TryParse(command.Args[0], out int limit))
                 {
-                    // history <n> - show last n entries
                     History.Print(limit);
                 }
                 else
                 {
-                    // history - show all entries
                     History.Print();
                 }
                 break;
