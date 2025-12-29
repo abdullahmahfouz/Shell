@@ -27,7 +27,7 @@ public class AutoCompletion
         bool lastKeyWasTab = false;
         
         // Reset history navigation state for new input
-        HistoryNavgation.Reset();
+        HistoryNavigation.Reset();
 
         
         // Main input loop - runs until Enter is pressed
@@ -46,14 +46,14 @@ public class AutoCompletion
             // 2. Handle UP ARROW - navigate to previous command in history
             else if (keyInfo.Key == ConsoleKey.UpArrow)
             {
-                HistoryNavgation.NavigateUp(stringBuilder);
+                HistoryNavigation.NavigateUp(stringBuilder);
                 lastKeyWasTab = false;
             }
             
             // 3. Handle DOWN ARROW - navigate to next command in history
             else if (keyInfo.Key == ConsoleKey.DownArrow)
             {
-                HistoryNavgation.NavigateDown(stringBuilder);
+                HistoryNavigation.NavigateDown(stringBuilder);
                 lastKeyWasTab = false;
             }
             

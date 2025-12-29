@@ -52,12 +52,21 @@ public class ProcessCommands
                 break;
 
             case "history":
-                int? limit = null;
-                if (command.Args.Length > 0 && int.TryParse(command.Args[0], out int n))
+                if (command.Args.Length >= 2 && command.Args[0] == "-r")
                 {
-                    limit = n;
+                    // history -r <path> - read from file
+                    History.ReadFromFile(command.Args[1]);
                 }
-                RunWithRedirections(command, () => History.Print(limit));
+                else if (command.Args.Length > 0 && int.TryParse(command.Args[0], out int limit))
+                {
+                    // history <n> - show last n entries
+                    History.Print(limit);
+                }
+                else
+                {
+                    // history - show all entries
+                    History.Print();
+                }
                 break;
 
             case "cat":

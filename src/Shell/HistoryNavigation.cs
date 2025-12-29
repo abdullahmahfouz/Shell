@@ -1,7 +1,8 @@
 
 using System.Text;
 
-public class HistoryNavgation
+/// <summary>Handles Up/Down arrow navigation through command history</summary>
+public class HistoryNavigation
 {
     // Tracks current position in history when navigating with arrows
     // -1 means not navigating (at the fresh input line)
