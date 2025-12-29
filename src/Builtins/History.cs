@@ -5,6 +5,7 @@ using System.IO;
 public static class History
 {
     private static readonly List<string> commandHistory = new List<string>();
+    private static int lastSavedIndex = 0;  // Track what's already been saved
 
     public static void Add(string command)
     {
@@ -27,22 +28,32 @@ public static class History
                 commandHistory.Add(line);
             }
         }
+        // After reading, mark all as "saved" so -a won't duplicate them
+        lastSavedIndex = commandHistory.Count;
     }
 
-    /// <summary>Writes history to file (overwrites existing content)</summary>
+    /// <summary>Writes ALL history to file (overwrites existing content)</summary>
     public static void WriteToFile(string filePath)
     {
         CreateDirectoryIfNeeded(filePath);
-        // WriteAllLines = OVERWRITE (erase old, write new)
         File.WriteAllLines(filePath, commandHistory);
+        lastSavedIndex = commandHistory.Count;
     }
 
-    /// <summary>Appends history to file (keeps existing content)</summary>
+    /// <summary>Appends only NEW commands to file (since last read/write)</summary>
     public static void AppendToFile(string filePath)
     {
         CreateDirectoryIfNeeded(filePath);
-        // AppendAllLines = ADD TO END (keep old, add new)
-        File.AppendAllLines(filePath, commandHistory);
+        
+        // Only append commands that haven't been saved yet
+        var newCommands = new List<string>();
+        for (int i = lastSavedIndex; i < commandHistory.Count; i++)
+        {
+            newCommands.Add(commandHistory[i]);
+        }
+        
+        File.AppendAllLines(filePath, newCommands);
+        lastSavedIndex = commandHistory.Count;
     }
 
     private static void CreateDirectoryIfNeeded(string filePath)
