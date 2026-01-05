@@ -1,4 +1,4 @@
-# My Shell 🐚
+# My Shell 
 
 A simple shell I built in C#. It works like bash or zsh, but simpler!
 
